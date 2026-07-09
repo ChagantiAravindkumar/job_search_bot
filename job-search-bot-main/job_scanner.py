@@ -252,105 +252,49 @@ def get_verification_status(url):
 
 def scrape_job_listings():
     """
-    Scrapes fresher jobs quickly.
-    Stops after MAX_JOBS have been collected.
+    Queries python-jobspy for each keyword and location, cleans up results,
+    and runs them through the verification engine.
     """
-
+    # Import inside function to avoid load-time failure if package is not yet installed
     try:
         from jobspy import scrape_jobs
     except ImportError:
-        print("Install python-jobspy")
+        print("[ERROR] 'python-jobspy' is not installed. Please install requirements.txt first.")
         return pd.DataFrame()
 
-    all_jobs = []
-    total_jobs = 0
-
-    print("\n===== STARTING JOB SEARCH =====")
-
+    all_jobs_list = []
+    
+    print("\n=== STARTING JOB SCRAPING ===")
+    print(f"Keywords: {KEYWORDS}")
+    print(f"Locations: {CITIES}")
+    
+    # Loop over keywords and locations
     for keyword in KEYWORDS:
-
-        if total_jobs >= MAX_JOBS:
-            break
-
         for location in CITIES:
-
-            if total_jobs >= MAX_JOBS:
-                break
-
-            print(f"\nSearching: {keyword} | {location}")
-
+            print(f"Scraping '{keyword}' in '{location}'...")
             try:
-
+                # Scrape jobs posted in the last 48 hours to keep them fresh
                 jobs = scrape_jobs(
-                    site_name=["linkedin", "google"],
+                    site_name=["linkedin","indeed","google"],
                     search_term=keyword,
                     location=location,
-                    country_indeed="india",
-                    results_wanted=20,
-                    hours_old=48
+                    results_wanted=30,
+                    country_indeed='india',
+                    hours_old=168  # Only scrape fresh jobs from the last 48 hours
                 )
-
-                if jobs.empty:
-                    print("No jobs found.")
-                    continue
-
-                all_jobs.append(jobs)
-
-                total_jobs += len(jobs)
-
-                print(
-                    f"Collected {len(jobs)} jobs | Total = {total_jobs}"
-                )
-
+                
+                if not jobs.empty:
+                    print(f"-> Found {len(jobs)} jobs.")
+                    all_jobs_list.append(jobs)
+                else:
+                    print("-> No new jobs found.")
             except Exception as e:
-                print(e)
-
-    if len(all_jobs) == 0:
+                print(f"[WARNING] Failed scraping '{keyword}' in '{location}': {e}")
+                
+    if not all_jobs_list:
+        print("=== SCRAPING COMPLETED: No jobs found. ===")
         return pd.DataFrame()
 
-    combined_df = pd.concat(all_jobs, ignore_index=True)
-
-    combined_df.drop_duplicates(
-        subset=["title", "company", "location", "job_url"],
-        inplace=True
-    )
-
-    filtered_rows = []
-
-    for _, row in combined_df.iterrows():
-
-        title = row.get("title", "")
-        description = row.get("description", "")
-
-        if requires_experience(title, description):
-            continue
-
-        url = row.get("job_url_direct") or row.get("job_url")
-
-        status, platform = get_verification_status(url)
-
-        row_dict = dict(row)
-
-        row_dict["Verification Status"] = status
-        row_dict["Hosting/ATS Platform"] = platform
-        row_dict["application_deadline"] = extract_deadline(description)
-
-        filtered_rows.append(row_dict)
-
-    if len(filtered_rows) == 0:
-        return pd.DataFrame()
-
-    df = pd.DataFrame(filtered_rows)
-
-    df.sort_values(
-        by="Verification Status",
-        ascending=False,
-        inplace=True
-    )
-
-    print(f"\nFinal Jobs = {len(df)}")
-
-    return df
     
     # Combine all DataFrames
     combined_df = pd.concat(all_jobs_list, ignore_index=True)
