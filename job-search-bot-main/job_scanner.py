@@ -29,186 +29,30 @@ print("RECIPIENT_EMAIL:", bool(RECIPIENT_EMAIL))
 
 # Target Job Search Config
 CITIES = [
-    # Major IT Hubs
-    "Bengaluru, India",
     "Hyderabad, India",
+    "Bengaluru, India",
     "Pune, India",
     "Chennai, India",
-    "Mumbai, India",
-    "Delhi, India",
     "Noida, India",
-    "Gurugram, India",
-
-    # Growing Tech Cities
-    "Kolkata, India",
-    "Ahmedabad, India",
-    "Visakhapatnam, India",
-    "Coimbatore, India",
-    "Kochi, India",
-    "Thiruvananthapuram, India",
-    "Mysuru, India",
-    "Indore, India",
-    "Jaipur, India",
-    "Bhubaneswar, India",
-    "Nagpur, India",
-    "Lucknow, India",
-    "Vadodara, India",
-    "Surat, India",
-    "Chandigarh, India",
-
-    # Telangana & Andhra Pradesh
-    "Warangal, India",
-    "Vijayawada, India",
-    "Guntur, India",
-    "Tirupati, India",
-    "Kakinada, India",
-    "Rajahmundry, India",
-    "Nellore, India"
-
+    "Gurugram, India"
 ]
 
 # Target search keywords
 KEYWORDS = [
-
-# =========================
-# Data Science
-# =========================
-"Data Scientist",
-"Junior Data Scientist",
-"Associate Data Scientist",
-"Data Science Intern",
-"Data Science Trainee",
-"Data Analyst",
-"Junior Data Analyst",
-"Business Analyst",
-"Business Intelligence Analyst",
-"Analytics Engineer",
-"Decision Scientist",
-
-# =========================
-# Machine Learning & AI
-# =========================
-"Machine Learning Engineer",
-"Junior Machine Learning Engineer",
-"ML Engineer",
-"AI Engineer",
-"AI Developer",
-"Artificial Intelligence Engineer",
-"Deep Learning Engineer",
-"NLP Engineer",
-"Computer Vision Engineer",
-"Generative AI Engineer",
-"LLM Engineer",
-"Prompt Engineer",
-"MLOps Engineer",
-"AI Intern",
-"Machine Learning Intern",
-
-# =========================
-# Python
-# =========================
-"Python Developer",
-"Junior Python Developer",
-"Python Backend Developer",
-"Python Full Stack Developer",
-"Python Engineer",
-"Django Developer",
-"Flask Developer",
-"FastAPI Developer",
-"Python Intern",
-
-# =========================
-# Web Development
-# =========================
-"Frontend Developer",
-"Front End Developer",
-"Frontend Engineer",
-"HTML Developer",
-"CSS Developer",
-"JavaScript Developer",
-"React Developer",
-"React JS Developer",
-"Next.js Developer",
-"NextJS Developer",
-"Web Developer",
-"Full Stack Developer",
-"MERN Stack Developer",
-"MEAN Stack Developer",
-"Node.js Developer",
-"Express.js Developer",
-"Frontend Intern",
-"Web Development Intern",
-"Full Stack Intern",
-
-# =========================
-# Data Engineering
-# =========================
-"Data Engineer",
-"Junior Data Engineer",
-"Data Engineering Intern",
-"ETL Developer",
-"Big Data Engineer",
-
-# =========================
-# Database
-# =========================
-"SQL Developer",
-"Database Developer",
-"Database Engineer",
-
-# =========================
-# BI
-# =========================
-"Power BI Developer",
-"Tableau Developer",
-"BI Developer",
-
-# =========================
-# Cloud
-# =========================
-"AWS Developer",
-"Cloud Engineer",
-"Azure Developer",
-"GCP Engineer",
-
-# =========================
-# DevOps
-# =========================
-"DevOps Engineer",
-"Junior DevOps Engineer",
-"Docker Engineer",
-"Kubernetes Engineer",
-
-# =========================
-# QA
-# =========================
-"Software Engineer",
-"Software Developer",
-"Software Development Engineer",
-"SDE 1",
-"SDE I",
-"Associate Software Engineer",
-"Graduate Software Engineer",
-"Graduate Engineer Trainee",
-"Software Engineer Intern",
-"QA Engineer",
-"Automation Tester",
-
-# =========================
-# Freshers
-# =========================
-"Fresher Software Engineer",
-"Fresher Developer",
-"Graduate Program",
-"Campus Hiring",
-"Entry Level Software Engineer",
-"Entry Level Developer",
-"Intern",
-"Trainee Engineer",
-"Graduate Trainee",
-
+    "Software Engineer",
+    "Associate Software Engineer",
+    "Graduate Engineer Trainee",
+    "Python Developer",
+    "Data Analyst",
+    "Business Analyst",
+    "Analayst",
+    "Junior Data Scientist",
+    "Machine Learning Engineer",
+    "AI Engineer",
+    "Frontend Developer",
+    "Full Stack Developer",
+    "Intern"
 ]
-
 # Known Applicant Tracking Systems (ATS)
 ATS_DOMAINS = [
     "greenhouse.io",
@@ -408,49 +252,106 @@ def get_verification_status(url):
 
 def scrape_job_listings():
     """
-    Queries python-jobspy for each keyword and location, cleans up results,
-    and runs them through the verification engine.
+    Scrapes fresher jobs quickly.
+    Stops after MAX_JOBS have been collected.
     """
-    # Import inside function to avoid load-time failure if package is not yet installed
+
     try:
         from jobspy import scrape_jobs
     except ImportError:
-        print("[ERROR] 'python-jobspy' is not installed. Please install requirements.txt first.")
+        print("Install python-jobspy")
         return pd.DataFrame()
 
-    all_jobs_list = []
-    
-    print("\n=== STARTING JOB SCRAPING ===")
-    print(f"Keywords: {KEYWORDS}")
-    print(f"Locations: {CITIES}")
-    
-    # Loop over keywords and locations
+    all_jobs = []
+    total_jobs = 0
+
+    print("\n===== STARTING JOB SEARCH =====")
+
     for keyword in KEYWORDS:
+
+        if total_jobs >= MAX_JOBS:
+            break
+
         for location in CITIES:
-            print(f"Scraping '{keyword}' in '{location}'...")
+
+            if total_jobs >= MAX_JOBS:
+                break
+
+            print(f"\nSearching: {keyword} | {location}")
+
             try:
-                # Scrape jobs posted in the last 48 hours to keep them fresh
+
                 jobs = scrape_jobs(
-                    site_name=["linkedin","indeed","google"],
+                    site_name=["linkedin", "google"],
                     search_term=keyword,
                     location=location,
-                    results_wanted=100,
-                    country_indeed='india',
-                    hours_old=168  # Only scrape fresh jobs from the last 48 hours
+                    country_indeed="india",
+                    results_wanted=20,
+                    hours_old=48
                 )
-                
-                if not jobs.empty:
-                    print(f"-> Found {len(jobs)} jobs.")
-                    all_jobs_list.append(jobs)
-                else:
-                    print("-> No new jobs found.")
+
+                if jobs.empty:
+                    print("No jobs found.")
+                    continue
+
+                all_jobs.append(jobs)
+
+                total_jobs += len(jobs)
+
+                print(
+                    f"Collected {len(jobs)} jobs | Total = {total_jobs}"
+                )
+
             except Exception as e:
-                print(f"[WARNING] Failed scraping '{keyword}' in '{location}': {e}")
-                
-    if not all_jobs_list:
-        print("=== SCRAPING COMPLETED: No jobs found. ===")
+                print(e)
+
+    if len(all_jobs) == 0:
         return pd.DataFrame()
-        
+
+    combined_df = pd.concat(all_jobs, ignore_index=True)
+
+    combined_df.drop_duplicates(
+        subset=["title", "company", "location", "job_url"],
+        inplace=True
+    )
+
+    filtered_rows = []
+
+    for _, row in combined_df.iterrows():
+
+        title = row.get("title", "")
+        description = row.get("description", "")
+
+        if requires_experience(title, description):
+            continue
+
+        url = row.get("job_url_direct") or row.get("job_url")
+
+        status, platform = get_verification_status(url)
+
+        row_dict = dict(row)
+
+        row_dict["Verification Status"] = status
+        row_dict["Hosting/ATS Platform"] = platform
+        row_dict["application_deadline"] = extract_deadline(description)
+
+        filtered_rows.append(row_dict)
+
+    if len(filtered_rows) == 0:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(filtered_rows)
+
+    df.sort_values(
+        by="Verification Status",
+        ascending=False,
+        inplace=True
+    )
+
+    print(f"\nFinal Jobs = {len(df)}")
+
+    return df
+    
     # Combine all DataFrames
     combined_df = pd.concat(all_jobs_list, ignore_index=True)
     
