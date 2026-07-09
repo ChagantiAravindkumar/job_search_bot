@@ -316,8 +316,7 @@ def scrape_job_listings():
         # Check both job_url and job_url_direct (depending on what jobspy provides)
         url_to_check = row.get("job_url_direct") or row.get("job_url")
         status, platform = get_verification_status(url_to_check)
-        if any(x in domain for x in ["careers.","career.","jobs.","join.","apply."]):
-            return "Verified: Company Careers", domain
+       
         
         # Convert row to dict and add verification fields
         row_dict = dict(row)
