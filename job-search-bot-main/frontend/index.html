@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPulse - Verified Job Search Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Dates) -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                <span class="logo-text">Job<span class="gradient-text">Pulse</span></span>
+            </div>
+
+            <div class="sidebar-section">
+                <button id="scan-now-btn" class="scan-now-btn">
+                    <svg class="scan-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    <span>Scan New Jobs</span>
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Scraping History</h3>
+                <p class="subtitle">Select a date to view jobs</p>
+                <div class="date-list" id="date-list">
+                    <!-- Dates will be dynamically injected here -->
+                    <div class="loading-spinner-small"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Dashboard Stats -->
+            <section class="stats-banner">
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <div class="stat-details">
+                        <span class="stat-label">Total Jobs Found</span>
+                        <span class="stat-value" id="stat-total">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="stat-details">
+                        <span class="stat-label">Verified Career Pages</span>
+                        <span class="stat-value" id="stat-verified">0</span>
+                        <span class="stat-subtext" id="stat-verified-pct">0% success rate</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="stat-details">
+                        <span class="stat-label">Top Location</span>
+                        <span class="stat-value" id="stat-top-city">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters & Controls Bar -->
+            <section class="controls-card">
+                <div class="search-bar">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="text" id="search-input" placeholder="Search by job title or company...">
+                </div>
+
+                <div class="filter-group">
+                    <div class="select-wrapper">
+                        <select id="city-filter">
+                            <option value="">All Cities</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Hyderabad">Hyderabad</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Coimbatore">Coimbatore</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Mumbai">Mumbai</option>
+                        </select>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <label class="switch">
+                            <input type="checkbox" id="verified-filter">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label">Verified Only</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Filters Indicators -->
+            <div class="active-filters-info" id="active-filters-display">
+                Showing results for <strong id="current-date-display">...</strong>
+            </div>
+
+            <!-- Job Grid Section -->
+            <section class="job-grid-section">
+                <div class="job-grid" id="job-grid">
+                    <!-- Job Cards will be dynamically injected here -->
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Scanning database for jobs...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script Integration -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  job_search_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: job_search_bot
+    environment:
+      # These will load from the .env file in the same directory
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - RECIPIENT_EMAIL=${RECIPIENT_EMAIL}
+    ports:
+      - "8050:8050"
+    volumes:
+      - .:/app
+    restart: always
