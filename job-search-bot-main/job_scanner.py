@@ -32,6 +32,7 @@ CITIES = [
     "Hyderabad, India",
     "Bengaluru, India",
     "Pune, India",
+     "Mumbai, India",
     "Chennai, India",
     "Noida, India",
     "Gurugram, India"
@@ -51,7 +52,10 @@ KEYWORDS = [
     "AI Engineer",
     "Frontend Developer",
     "Full Stack Developer",
-    "Intern"
+    "Intern",
+    "ML INTERN"
+    "AI INTERN"
+    "Technical Support Engineer"
 ]
 # Known Applicant Tracking Systems (ATS)
 ATS_DOMAINS = [
@@ -103,9 +107,14 @@ JOB_BOARDS = [
 
     # Startup Jobs
     "wellfound.com",
-    "angel.co",
-    "ycombinator.com",
-    "yc-startup-jobs.com",
+    "peerlist.io",
+    "hasjob.co",
+    "devfolio.co",
+    "cutshort.io",
+    "instahyre.com",
+    "freshersworld.com",
+    "internshala.com",
+    "unstop.com"
 
     # Remote Jobs
     "remoteok.com",
@@ -275,7 +284,7 @@ def scrape_job_listings():
             try:
                 # Scrape jobs posted in the last 48 hours to keep them fresh
                 jobs = scrape_jobs(
-                    site_name=["linkedin","indeed","google"],
+                    site_name=["linkedin","indeed","google","glassdoor","zip_recruiter"],
                     search_term=keyword,
                     location=location,
                     results_wanted=30,
@@ -347,7 +356,8 @@ def send_email_with_excel(df):
     # Select and order columns for the Excel sheet
     columns_to_keep = [
         "title", "company", "location", "date_posted", "application_deadline",
-        "Verification Status", "Hosting/ATS Platform", "job_url"
+        "Verification Status", "Hosting/ATS Platform", "job_url","Resume Score",
+        "ATS Score"
     ]
     
     # Filter columns that actually exist in the dataframe
