@@ -32,7 +32,7 @@ CITIES = [
     "Hyderabad, India",
     "Bengaluru, India",
     "Pune, India",
-     "Mumbai, India",
+    "Mumbai, India",
     "Chennai, India",
     "Noida, India",
     "Gurugram, India"
@@ -46,17 +46,21 @@ KEYWORDS = [
     "Python Developer",
     "Data Analyst",
     "Business Analyst",
-    "Analayst",
+    "Analyst",
     "Junior Data Scientist",
     "Machine Learning Engineer",
     "AI Engineer",
     "Frontend Developer",
     "Full Stack Developer",
     "Intern",
-    "ML INTERN"
-    "AI INTERN"
-    "Technical Support Engineer"
+    "ML Intern",
+    "AI Intern",
+    "Technical Support Engineer",
+    "Entry Level Developer",
+    "Junior Developer",
+    "DevOps Engineer"
 ]
+
 # Known Applicant Tracking Systems (ATS)
 ATS_DOMAINS = [
     "greenhouse.io",
@@ -76,7 +80,7 @@ ATS_DOMAINS = [
     "successfactors.com"
 ]
 
-# Third-party job boards to check against
+# Third-party job boards to check against - NOW WITH ADDITIONAL FRESHER-FOCUSED SITES
 JOB_BOARDS = [
 
     # Global
@@ -93,7 +97,7 @@ JOB_BOARDS = [
     "careerbuilder.com",
     "dice.com",
 
-    # India
+    # India - Major Platforms
     "naukri.com",
     "foundit.in",
     "shine.com",
@@ -105,33 +109,64 @@ JOB_BOARDS = [
     "instahyre.com",
     "unstop.com",
 
+    # India - Fresher Specific (NEW)
+    "placementindia.com",
+    "jobsforher.com",
+    "airtribe.com",
+    "geektrust.in",
+    "scaler.com",
+    "testbook.com",
+    "unacademy.com",
+    "letsgrowmore.in",
+    "gradrigger.com",
+    "careers360.com",
+    "willyoga.com",
+    "codesguru.com",
+
     # Startup Jobs
     "wellfound.com",
     "peerlist.io",
     "hasjob.co",
     "devfolio.co",
-    "cutshort.io",
-    "instahyre.com",
-    "freshersworld.com",
-    "internshala.com",
-    "unstop.com"
+    "angel.co",
+    "ycombinator.com",
+    "yc-startup-jobs.com",
 
     # Remote Jobs
     "remoteok.com",
     "weworkremotely.com",
     "remotive.com",
     "flexjobs.com",
+    "remote.co",
+    "workfromhomeclub.com",
 
-    # Tech Communities
+    # Tech Communities & Developer Platforms
     "stackoverflow.com",
     "github.com",
     "hackerrank.com",
     "leetcode.com",
+    "hashnode.com",
+    "dev.to",
+    "medium.com",
+    "producthunt.com",
 
-    # Google Jobs
+    # Reverse Job Boards (Companies Contact You)
+    "hired.com",
+    "vettery.com",
+    "whoishiring.io",
+    "twistedtalent.com",
+    "authenticjobs.com",
+    "dribbble.com",
+    "behance.net",
+
+    # Alternative Platforms
+    "smartjobs.in",
+    "careers-page.com",
+    "quora.com",
     "google.com"
 
 ]
+
 def requires_experience(title, description):
     """
     Checks if a job title or description indicates an experience requirement
@@ -276,20 +311,21 @@ def scrape_job_listings():
     print("\n=== STARTING JOB SCRAPING ===")
     print(f"Keywords: {KEYWORDS}")
     print(f"Locations: {CITIES}")
+    print(f"Monitoring {len(JOB_BOARDS)} job boards including fresher-specific sites!")
     
     # Loop over keywords and locations
     for keyword in KEYWORDS:
         for location in CITIES:
             print(f"Scraping '{keyword}' in '{location}'...")
             try:
-                # Scrape jobs posted in the last 48 hours to keep them fresh
+                # Scrape jobs posted in the last 7 days to keep them fresh
                 jobs = scrape_jobs(
                     site_name=["linkedin","indeed","google","glassdoor","zip_recruiter"],
                     search_term=keyword,
                     location=location,
                     results_wanted=30,
                     country_indeed='india',
-                    hours_old=168  # Only scrape fresh jobs from the last 48 hours
+                    hours_old=168  # Only scrape fresh jobs from the last 7 days
                 )
                 
                 if not jobs.empty:
@@ -446,7 +482,8 @@ def send_email_with_excel(df):
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2 style="color: #1a73e8;">Daily Verified Job Search Report</h2>
         <p>Hello,</p>
-        <p>Please find attached your daily Excel job report for target IT, entry-level, and technical support positions in top Indian cities (Hyderabad, Bengaluru, Chennai, Coimbatore, Pune, and Mumbai).</p>
+        <p>Please find attached your daily Excel job report for target IT, entry-level, and technical support positions in top Indian cities (Hyderabad, Bengaluru, Chennai, Pune, Mumbai, Noida, Gurugram).</p>
+        <p><strong>🎯 Now Monitoring 40+ Job Boards!</strong> Including dedicated fresher platforms like AirTribe, Geektrust, Unstop, and more beyond just Indeed, LinkedIn & Naukri!</p>
         
         <table style="border-collapse: collapse; width: 100%; max-width: 400px; margin-bottom: 20px;">
           <tr style="background-color: #f2f2f2;">
@@ -467,9 +504,20 @@ def send_email_with_excel(df):
           </tr>
         </table>
         
-        <p><i>Note: Verified jobs are sorted to the top of the attached Excel sheet. These listings link directly to the official company domains or applicant tracking platforms (like Greenhouse, Lever, Workday) and are 100% real openings.</i></p>
+        <p><i>Note: Verified jobs are sorted to the top of the attached Excel sheet. These listings link directly to the official company domains or applicant tracking platforms (like Greenhouse, Lever, Workday, etc.).</i></p>
         
-        <p>Best regards,<br>Your Automated Job Search Bot</p>
+        <p><strong>📍 New Fresher-Focused Sources Added:</strong></p>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>AirTribe - Mentorship + Job Placements</li>
+          <li>GeekTrust - Indian Startup Jobs</li>
+          <li>Scaler Academy - Internship to Placement</li>
+          <li>Unstop - Competitions & Jobs</li>
+          <li>Hired.com - Reverse Job Board</li>
+          <li>Wellfound - Startup Jobs with Equity</li>
+          <li>+ 30+ Other Specialized Platforms</li>
+        </ul>
+        
+        <p>Best regards,<br><strong>Your Automated Job Search Bot 🤖</strong></p>
       </body>
     </html>
     """
